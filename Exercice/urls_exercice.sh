@@ -2,7 +2,7 @@
 
 #===============================================================================
 # VOUS DEVEZ MODIFIER CE BLOC DE COMMENTAIRES.
-# Ce programme
+# Ce programme récupère des informations liées à nos urls et les ajoute à un tableau HTML.
 # On lance le programme en utilisant bash + chemin/nom du script
 # les paramètres = le chemin vers un fichier d'url : ../URLS/urls_en.txt
 #$2 = tableauHTML.html
@@ -34,19 +34,21 @@ echo "<html>
                     <th>N°</th>
                     <th>URLS $fichier</th>
                     <th>code HTTP</th>
+                    <th>Encodage</th>
                 </tr>" > $fichier_tableau
 
 lineno=1;
 
 while read -r line;
 do
-    codeHTTP=$(curl -L -w '%{http_code}\n' -o ciao.html $line)
-    # header=$(curl -vsA '%{http_code}\n' -o /dev/null $line)
+    codeHTTP=$(curl -s -L -w '%{http_code}\n' -o ciao.html $line)
+    encodage=$(curl -Is -L -w '%{content_type}\n' $line | grep -i -P -o "charset=\S+" | cut -d= -f2 | head -n1)
     echo "
     <tr>
         <th>$lineno</th>
         <th><a href="$line">$line</a></th>
         <th>$codeHTTP</th>
+        <th>$encodage</th>
     </tr>" >> $fichier_tableau
 	# echo "Ligne $lineno: $header" >> fichier_tableau
 	lineno=$((lineno+1));
